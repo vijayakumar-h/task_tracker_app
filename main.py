@@ -1,10 +1,10 @@
 from contextlib import asynccontextmanager
+from a2wsgi import ASGIMiddleware
 
 import aiosqlite
 from fastapi import FastAPI, Depends
 
 from database import init_db, get_db
-
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -12,6 +12,8 @@ async def lifespan(app: FastAPI):
     yield
 
 app = FastAPI(lifespan=lifespan)
+
+wsgi_app = ASGIMiddleware(app)
 
 @app.get('/tasks')
 async def read_tasks(db:aiosqlite.Connection = Depends(get_db)):
